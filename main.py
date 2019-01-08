@@ -9,6 +9,8 @@ import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.feature_extraction.text import CountVectorizer
 
+MAX_FEATURES = 10000
+
 nltk.download('stopwords')
 nltk.download('wordnet')
 
@@ -130,37 +132,60 @@ def bag_of_words(norm_text):
                                  tokenizer=None,
                                  preprocessor=None,
                                  stop_words=None,
-                                 max_features=5000)
+                                 max_features=MAX_FEATURES)
     train_data = vectorizer.fit_transform(norm_text)
     # print(train_data)
     # Numpy массивы легко работают, поэтому преобразуем получившийся результат в массив
     train_data = train_data.toarray()
-    print("toarray")
-    print(train_data.shape)
+    # print("toarray")
+    # print(train_data.shape)
     # Посмотрим на слова в словаре
     vocab = vectorizer.get_feature_names()
     return train_data, vocab
 
 
-def print_often_words(train_data, vocab):
+def print_often_words(train_data, vocab, length=10):
     # Sum up the counts of each vocabulary word
     dist = np.sum(train_data, axis=0)
     # For each, print the vocabulary word and the number of times it
     # appears in the training set
-    for count, tag in sorted([(count, tag) for tag, count in zip(vocab, dist)], reverse=True)[1:20]:
+    for count, tag in sorted([(count, tag) for tag, count in zip(vocab, dist)], reverse=True)[0:length]:
         print(count, tag)
 
 
+def tfidf_method(norm_text):
+    vectorizer = TfidfVectorizer(analyzer="word",
+                                 tokenizer=None,
+                                 preprocessor=None,
+                                 stop_words=None,
+                                 max_features=MAX_FEATURES)
+    matrix = vectorizer.fit_transform(norm_text)
+    # float_formatter = lambda x: "%.2f" % x
+    # np.set_printoptions(formatter={'float_kind': float_formatter})
+    return matrix.toarray(), vectorizer.get_feature_names()
+
+
+def print_info_matrix(matrix, vocab):
+    print(matrix.shape)
+    # print(np.matrix(matrix))
+    print(vocab[0:100])
+    print_often_words(matrix, vocab)
+
+
 def main():
-    test = pd.read_csv(DATA_FOR_LEARNING, header=0, delimiter="\t", quoting=3)
+    test = pd.read_csv(DATA_FOR_LEARNING_FULL, header=0, delimiter="\t", quoting=3)
     # testing(test)
     norm_text = normalization_text(test)
-    print(norm_text)
-    print(norm_text[0])
+    # print(norm_text)
+    # print(len(norm_text[1]))
+    # print(len(norm_text[2]))
+    print("Tfidf method")
+    [matrix_tfidf, vocab_tfidf] = tfidf_method(norm_text)
+    print_info_matrix(matrix_tfidf, vocab_tfidf)
+
+    print("\nBag of words")
     [matrix, vocab] = bag_of_words(norm_text)
-    print(vocab[0:100])
-    print(np.matrix(matrix))
-    print_often_words(matrix, vocab)
+    print_info_matrix(matrix, vocab)
     # write_to_file(matrix)
 
 
