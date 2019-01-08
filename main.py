@@ -5,7 +5,9 @@ from nltk.stem.wordnet import WordNetLemmatizer
 from bs4 import BeautifulSoup
 import re
 from numpy import load
+import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.feature_extraction.text import CountVectorizer
 
 nltk.download('stopwords')
 nltk.download('wordnet')
@@ -14,6 +16,7 @@ REVIEW = "review"
 
 FILE = "testData.tsv"
 DATA_FOR_LEARNING = "labeledTrainData_simple.tsv"
+DATA_FOR_LEARNING_FULL = "labeledTrainData.tsv"
 
 
 def normalization(blank_review, remove_stop_words=False, need_to_lemm=False):
@@ -63,6 +66,7 @@ def normalization_text(raw_data):
     return net_initial_reviews
 
 
+# It is not used
 def review_of_sent(blank_review, tokenizer, remove_stop_words=False, need_to_lemm=False):
     # Функция для разделения обзора(отзыва) на разобранные предложения.
     # Возвращает список предложений, где каждое предложение представляет собой список слов
@@ -108,27 +112,43 @@ def testing(test):
     # print(normalization(check, True, True))
 
 
+def write_to_file(train_data):
+    print(np.matrix(train_data))
+    # output = pd.DataFrame(data={"id": train_data[0], "sentiment": train_data[1]})
+    # df.to_csv(file_name, sep='\t')
+    # # Скопируем результаты в таблицу данных pandas с колонкой «id» и
+    # # столбец «настроение»
+    # output = pd.DataFrame(data={"id": train_data["id"], "sentiment": result})
+    # # Используем pandas для записи выходного файла, разделенного запятыми
+    # output.to_csv("Bag_of_Words_model.csv", index=False, quoting=3)
+
+
 def bag_of_words(norm_text):
     # Инициализируем объект «CountVectorizer», который представляет собой
     # инструмент словаря scikit-learn.
-    counter_of_vectors = TfidfVectorizer(analyzer="word",
-                                         tokenizer=None,
-                                         preprocessor=None,
-                                         stop_words=None)
-    # TODO Check: got an unexpected keyword argument 'max_func'
-    composition_data_func = counter_of_vectors.fit_transform(norm_text)
-    print(composition_data_func)
+    vectorizer = CountVectorizer(analyzer="word",
+                                 tokenizer=None,
+                                 preprocessor=None,
+                                 stop_words=None,
+                                 max_features=5000)
+    train_data = vectorizer.fit_transform(norm_text)
+    # print(train_data)
     # Numpy массивы легко работают, поэтому преобразуем получившийся результат в массив
-    composition_data_func = composition_data_func.toarray()
-    print("epta")
-    print(composition_data_func)
+    train_data = train_data.toarray()
+    print("toarray")
+    print(train_data.shape)
     # Посмотрим на слова в словаре
-    # TODO!!!!!!!!!!!!
-    # vocab = composition_data_func.get_func_names()
-    # print(vocab)
-    # vocab
-    # print("Training the random forest...")
-    # forest = RandomForestClassifier(n_estimators=100)
+    vocab = vectorizer.get_feature_names()
+    return train_data, vocab
+
+
+def print_often_words(train_data, vocab):
+    # Sum up the counts of each vocabulary word
+    dist = np.sum(train_data, axis=0)
+    # For each, print the vocabulary word and the number of times it
+    # appears in the training set
+    for count, tag in sorted([(count, tag) for tag, count in zip(vocab, dist)], reverse=True)[1:20]:
+        print(count, tag)
 
 
 def main():
@@ -137,7 +157,11 @@ def main():
     norm_text = normalization_text(test)
     print(norm_text)
     print(norm_text[0])
-    bag_of_words(norm_text)
+    [matrix, vocab] = bag_of_words(norm_text)
+    print(vocab[0:100])
+    print(np.matrix(matrix))
+    print_often_words(matrix, vocab)
+    # write_to_file(matrix)
 
 
 if __name__ == '__main__':
