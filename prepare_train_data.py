@@ -17,6 +17,7 @@ BAG_OF_WORDS_SMALL = 'bag_of_words_small'
 BAG_OF_WORDS_STARS_SMALL = 'bag_of_words_stars_small'
 BAG_OF_WORDS_VOCAB_SMALL = 'bag_of_words_vocab_small'
 BAG_OF_WORDS_FULL = 'bag_of_words_full'
+BAG_OF_WORDS_STARS_FULL = 'bag_of_words_stars_full'
 BAG_OF_WORDS_VOCAB_FULL = 'bag_of_words_vocab_full'
 
 BAG_OF_WORDS = 'labeledBow.feat'
@@ -217,7 +218,7 @@ def read_directory(directory):
     # row = []
     # matrix = []
     i = 0
-    matrix = ["0", "a"]
+    matrix = ["0", "a"]  # TODO remove it
     # size = only_files.index()
     print("start handling files")
     for file in only_files:
@@ -234,7 +235,7 @@ def read_directory(directory):
         i = i + 1
         if (i + 1) % 100 == 0:
             print("Files %d" % (i + 1))
-            break
+            # break
         if (i + 1) % 1000 == 0:
             break
     return matrix
@@ -288,9 +289,10 @@ def prepare_data():
 
 
 def take_bag_of_words():
-    # matrix = np.load(BAG_OF_WORDS_FULL + NPY)
-    # vocab = np.load(BAG_OF_WORDS_VOCAB_FULL + NPY)
-    matrix = np.load(BAG_OF_WORDS_SMALL + NPY)
-    stars = np.load(BAG_OF_WORDS_STARS_SMALL + NPY)
-    vocab = np.load(BAG_OF_WORDS_VOCAB_SMALL + NPY)
+    matrix = np.load(BAG_OF_WORDS_FULL + NPY)
+    stars = np.load(BAG_OF_WORDS_STARS_FULL + NPY)
+    vocab = np.load(BAG_OF_WORDS_VOCAB_FULL + NPY)
+    # matrix = np.load(BAG_OF_WORDS_SMALL + NPY)
+    # stars = np.load(BAG_OF_WORDS_STARS_SMALL + NPY)
+    # vocab = np.load(BAG_OF_WORDS_VOCAB_SMALL + NPY)
     return matrix, stars, vocab
