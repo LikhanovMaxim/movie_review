@@ -1,2 +1,6 @@
 .idea
 /example
+*.npy
+.pytest_cache/
+__pycache__/
+
