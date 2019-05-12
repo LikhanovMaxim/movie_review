@@ -3,4 +3,4 @@
 *.npy
 .pytest_cache/
 __pycache__/
-
+/data
