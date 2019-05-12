@@ -27,6 +27,8 @@ def change(train_y, size):
 # Test-Accuracy: 0.4069759998321533
 # Changed hidden_layer from 50 to 500
 # Test-Accuracy: 0.3542720012664795
+# Changed epochs from 5 to 10
+# Test-Accuracy: 0.38552000164985656
 def run():
     [matrix, stars, vocab] = prepare.take_bag_of_words()
     prepare.print_info_matrix(matrix, vocab)

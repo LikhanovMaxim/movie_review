@@ -141,6 +141,6 @@ def learn_data():
 
 
 if __name__ == '__main__':
-    # learn_data()
     run()
+    # learn_data()
     # example_second()
