@@ -8,7 +8,7 @@ PATTERN = '_(.*)\.'
 DIRECTORY = "data\\"
 
 
-def read_directory(directory):
+def read_directory(directory, is_small):
     only_files = [f for f in listdir(directory) if isfile(join(directory, f))]
     i = 0
     matrix = ["0", "a"]  # TODO remove it
@@ -22,12 +22,14 @@ def read_directory(directory):
         i = i + 1
         if (i + 1) % 100 == 0:
             print("Files %d" % (i + 1))
+            if is_small:
+                break
     return matrix
 
 
 # 1) Take reviews from data\neg and data\pos
 # 2) Parse them and return np.stack with star and text
-def take_train_data():
-    pos = read_directory(DIRECTORY + "pos\\")
-    neg = read_directory(DIRECTORY + "neg\\")
+def take_train_data(is_small):
+    pos = read_directory(DIRECTORY + "pos\\", is_small)
+    neg = read_directory(DIRECTORY + "neg\\", is_small)
     return np.vstack((pos, neg))

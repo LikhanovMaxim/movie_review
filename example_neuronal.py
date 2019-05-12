@@ -14,39 +14,72 @@ from keras.layers import Dense, Activation
 # который короче 10 000 слов, мы заполняем нулями. Это делается потому,
 # что самый большой обзор имеет почти такой же размер, а каждый элемент
 # входных данных нашей нейронной сети должен иметь одинаковый размер.
-def vectorize(sequences, dimension=10000):
+def vectorization(sequences, dimension=10000):
     results = np.zeros((len(sequences), dimension))
     for i, sequence in enumerate(sequences):
         results[i, sequence] = 1
     return results
 
 
-def column(matrix, i):
-    return [row[i] for row in matrix]
+# def column(matrix, i):
+#     return [row[i] for row in matrix]
 
 
-
-def run():
+def take_data():
     num_words = 10000
     (training_data, training_targets), (testing_data, testing_targets) = imdb.load_data(num_words=num_words)
     data = np.concatenate((training_data, testing_data), axis=0)
-
     targets = np.concatenate((training_targets, testing_targets), axis=0)
-    data = vectorize(data, num_words)
     # Также нужно выполнить преобразование переменных в тип float.
     targets = np.array(targets).astype("float32")
+    return data, num_words, targets
+
+
+def run():
+    data, num_words, targets = take_data()
+    data = vectorization(data, num_words)
     # Разделим датасет на обучающий и тестировочный наборы.
     # Обучающий набор будет состоять из 40 000 обзоров,
     # тестировочный — из 10 000.
-    size_tests_data = 10000
-    train_x = data[size_tests_data:]
-    train_y = targets[size_tests_data:]
-    test_x = data[:size_tests_data]
-    test_y = targets[:size_tests_data]
-    # Последовательная модель
+    test_x, test_y, train_x, train_y = divide_train_and_test_data(data, targets)
+    model = create_model(num_words)
+    # compiling the model
+    # Будем использовать оптимизатор «adam».
+    # Оптимизатор — это алгоритм, который изменяет веса и смещения во время обучения.
+    # В качестве функции потерь используем бинарную кросс-энтропию (так как мы работаем с бинарной классификацией),
+    # в качестве метрики оценки — точность.
+    model.compile(
+        optimizer="adam",
+        loss="binary_crossentropy",
+        metrics=["accuracy"]
+    )
+    # learn neuronal network
+    # Мы будем делать это с размером партии 500 и только двумя эпохами,
+    # поскольку я выяснил, что модель начинает переобучаться, если тренировать ее дольше.
+    # Размер партии определяет количество элементов, которые будут распространяться по сети,
+    # а эпоха — это один проход всех элементов датасета.
+    # Обычно больший размер партии приводит к более быстрому обучению, но не всегда — к быстрой сходимости.
+    # Меньший размер партии обучает медленнее, но может быстрее сходиться.
+    # Выбор того или иного варианта определенно зависит от типа решаемой задачи, и лучше попробовать каждый из них.
+    # Если вы новичок в этом вопросе, я бы посоветовал вам сначала использовать размер партии 32,
+    # что является своего рода стандартом.
+    results = model.fit(
+        train_x, train_y,
+        epochs=2,
+        batch_size=500,
+        validation_data=(test_x, test_y)
+    )
+    print("Test-Accuracy:", np.mean(results.history["val_acc"]))
+
+
+def create_model(num_words):
+    # Последовательная модель https://keras.io/models/sequential/
     model = models.Sequential()
     # Input - Layer
     # На каждом слое используется функция «dense» для полного соединения слоев друг с другом.
+    # Обратите внимание, что мы устанавливаем размер входных элементов датасета равным 10 000,
+    # потому что наши обзоры имеют размер до 10 000 целых чисел.
+    # Входной слой принимает элементы с размером 10 000, а выдает — с размером 50.
     model.add(layers.Dense(50, activation="relu", input_shape=(num_words,)))
     # Hidden - Layers. Dropout
     # Обратите внимание, что вы всегда должны использовать коэффициент исключения в диапазоне от 20% до 50%.
@@ -57,19 +90,16 @@ def run():
     # Output- Layer
     model.add(layers.Dense(1, activation="sigmoid"))
     model.summary()
-    # compiling the model
-    model.compile(
-        optimizer="adam",
-        loss="binary_crossentropy",
-        metrics=["accuracy"]
-    )
-    results = model.fit(
-        train_x, train_y,
-        epochs=2,
-        batch_size=500,
-        validation_data=(test_x, test_y)
-    )
-    print("Test-Accuracy:", np.mean(results.history["val_acc"]))
+    return model
+
+
+def divide_train_and_test_data(data, targets):
+    size_tests_data = 10000
+    train_x = data[size_tests_data:]
+    train_y = targets[size_tests_data:]
+    test_x = data[:size_tests_data]
+    test_y = targets[:size_tests_data]
+    return test_x, test_y, train_x, train_y
 
 
 def example_second():
@@ -94,8 +124,23 @@ def example_second():
     model.fit(data, one_hot_labels, epochs=10, batch_size=32)
 
 
+def learn_data():
+    data, num_words, targets = take_data()
+    print("Number of unique words:", len(np.unique(np.hstack(data))))
+    print("Categories:", np.unique(targets))
+    length = [len(i) for i in data]
+    print("Average Review length:", np.mean(length))
+    print("Standard Deviation:", round(np.std(length)))
+    print("Example:")
+    print("Label:", targets[0])
+    print(data[0])
+    index = imdb.get_word_index()
+    reverse_index = dict([(value, key) for (key, value) in index.items()])
+    decoded = " ".join([reverse_index.get(i - 3, "#") for i in data[0]])
+    print(decoded)
+
+
 if __name__ == '__main__':
+    # learn_data()
     run()
-    # prepare_ska()
-    # run_my()
     # example_second()

@@ -20,13 +20,7 @@
         
    
 
-Open questions:
-1) 
-2) 
 
 TODO:
 
-1) Run prepare_train_data.py normalization
-1) Run app for BAG_OF_WORDS_SMALL.
-1) example_neuronal.py vs main.py
 1) Decrease bag_of_words_full.npy 12,3 ГБ O_o

@@ -17,6 +17,8 @@ BAG_OF_WORDS_VOCAB_FULL = 'bag_of_words_vocab_full'
 # BAG_OF_WORDS = 'labeledBow.feat'
 
 MAX_FEATURES = 10000
+
+
 #
 # FILE = "testData.tsv"
 # DATA_FOR_LEARNING = "labeledTrainData_simple.tsv"
@@ -70,17 +72,19 @@ def write_to_file(train_data, file_name):
     np.save(file_name, train_data)
 
 
-def prepare_data_by_bag_of_words():
-    train_data = parser.take_train_data()
+def prepare_data_by_bag_of_words(is_small=True, is_write=False):
+    train_data = parser. take_train_data(is_small)
 
     norm_text = norm.normalization_text_matrix(train_data)
 
     print("\nBag of words")
     [matrix, vocab] = bag_of_words(norm_text)
 
-    write_to_file(matrix, BAG_OF_WORDS_SMALL + "TestAAAAAAAAAAA")
-    write_to_file(column(train_data, 0), BAG_OF_WORDS_STARS_SMALL + "TestAAAAAAAAAAA")
-    write_to_file(vocab, BAG_OF_WORDS_VOCAB_SMALL + "TestAAAAAAAAAAA")
+    print_info_matrix(matrix, vocab)
+    if is_write:
+        write_to_file(matrix, BAG_OF_WORDS_SMALL)
+        write_to_file(column(train_data, 0), BAG_OF_WORDS_STARS_SMALL)
+        write_to_file(vocab, BAG_OF_WORDS_VOCAB_SMALL)
 
 
 def take_bag_of_words():
