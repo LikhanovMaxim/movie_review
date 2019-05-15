@@ -7,6 +7,7 @@ from keras.datasets import imdb
 import prepare_train_data as prepare
 from keras.models import Sequential
 from keras.layers import Dense, Activation
+from keras.utils import plot_model
 
 
 # Пришло время подготовить данные. Нужно векторизовать каждый обзор и заполнить его нулями,

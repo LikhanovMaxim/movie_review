@@ -12,6 +12,7 @@ def change(train_y, size):
     train_y = [int(i) for i in train_y]
     train_y = np.asarray(train_y)
     train_y = np.reshape(train_y, (size, 1))
+    # # TODO what is it? Delete it:
     train_y[0] = 5
     train_y[1] = 6
     train_y[2] = 0
@@ -29,6 +30,8 @@ def change(train_y, size):
 # Test-Accuracy: 0.3542720012664795
 # Changed epochs from 5 to 10
 # Test-Accuracy: 0.38552000164985656
+# Changed optimizer from 'rmsprop' to adam
+# Test-Accuracy: 0.39996799993515014
 def run():
     [matrix, stars, vocab] = prepare.take_bag_of_words()
     prepare.print_info_matrix(matrix, vocab)
@@ -44,19 +47,24 @@ def run():
     )
     # Convert labels to categorical one-hot encoding
     train_y = change(train_y, size_rows - size_tests_data)
-    one_hot_labels = to_categorical(train_y, num_classes=11)
+    train_Y = to_categorical(train_y, num_classes=11)
 
     test_y = change(test_y, size_tests_data)
-    one_hot_labels_2 = to_categorical(test_y, num_classes=11)
+    test_Y = to_categorical(test_y, num_classes=11)
+
+    # Debug: np.nonzero(test_x[1] == 1)
 
     results = model.fit(
         train_x,
-        one_hot_labels,
+        train_Y,
         epochs=5,  # 5, 10, 15, 20 maximum
         batch_size=500,
-        validation_data=(test_x, one_hot_labels_2)
+        validation_data=(test_x, test_Y)
     )
+    score = model.evaluate(test_x, test_Y, verbose=0)
     print("Test-Accuracy:", np.mean(results.history["val_acc"]))
+    print('Test score:', score[0])
+    print('Test accuracy:', score[1])
 
 
 def create_model(num_words):
@@ -70,6 +78,7 @@ def create_model(num_words):
     # Hidden - Layers. Dropout
     # Обратите внимание, что вы всегда должны использовать коэффициент исключения в диапазоне от 20% до 50%.
     model.add(layers.Dropout(0.3, noise_shape=None, seed=None))
+    # TODO try to change 0.3 0.2
     model.add(layers.Dense(50, activation="relu"))
     model.add(layers.Dropout(0.2, noise_shape=None, seed=None))
     model.add(layers.Dense(50, activation="relu"))
@@ -79,6 +88,7 @@ def create_model(num_words):
     return model
 
 
+# TODO check this method!!!!!!!!!!!!!!!!!
 def divide_train_and_test_data(matrix, size_rows, stars):
     size_tests_data = int(size_rows / 4)
     size_tests_data_del_2 = int(size_tests_data / 2)

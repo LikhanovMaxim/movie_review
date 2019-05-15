@@ -1,5 +1,6 @@
 import prepare_train_data as prepare
 import neuronal as neuronal
+import neuronal_sigmoid as neuronal_sigmoid
 
 
 # it is for test
@@ -9,6 +10,8 @@ def take_data():
     prepare.print_info_matrix(matrix, vocab)
     print(stars)
     print(stars.shape)
+
+
 #   so we get matrix for 25000 * 66444
 #                   25000 - count of reviews: 12500 pos + 12500 neg
 #                   66444 - count of unique words TODO чет много
@@ -33,6 +36,7 @@ def prepare_data():
 
 
 if __name__ == '__main__':
-    neuronal.run()
+    # neuronal.run()
+    neuronal_sigmoid.run()
     # take_data()
     # prepare_data()
