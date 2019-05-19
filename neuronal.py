@@ -12,7 +12,7 @@ def change(train_y, size):
     train_y = [int(i) for i in train_y]
     train_y = np.asarray(train_y)
     train_y = np.reshape(train_y, (size, 1))
-    # # TODO what is it? Delete it:
+    # # TODO how to fix this workaround
     train_y[0] = 5
     train_y[1] = 6
     train_y[2] = 0
@@ -44,6 +44,7 @@ def run():
         optimizer="rmsprop",
         loss="categorical_crossentropy",  # binary_crossentropy
         metrics=["accuracy"]
+        # TODO use categorical_crossentropy ? http://qaru.site/questions/196148/keras-modelevaluate-vs-modelpredict-accuracy-difference-in-multi-class-nlp-task/1073471#1073471
     )
     # Convert labels to categorical one-hot encoding
     train_y = change(train_y, size_rows - size_tests_data)
@@ -61,6 +62,7 @@ def run():
         batch_size=500,
         validation_data=(test_x, test_Y)
     )
+    # TODO add cross-validation: validation_split=0.33
     score = model.evaluate(test_x, test_Y, verbose=0)
     print("Test-Accuracy:", np.mean(results.history["val_acc"]))
     print('Test score:', score[0])
@@ -78,7 +80,7 @@ def create_model(num_words):
     # Hidden - Layers. Dropout
     # Обратите внимание, что вы всегда должны использовать коэффициент исключения в диапазоне от 20% до 50%.
     model.add(layers.Dropout(0.3, noise_shape=None, seed=None))
-    # TODO try to change 0.3 0.2
+    # TODO try to change 0.3 & 0.2
     model.add(layers.Dense(50, activation="relu"))
     model.add(layers.Dropout(0.2, noise_shape=None, seed=None))
     model.add(layers.Dense(50, activation="relu"))
@@ -88,7 +90,6 @@ def create_model(num_words):
     return model
 
 
-# TODO check this method!!!!!!!!!!!!!!!!!
 def divide_train_and_test_data(matrix, size_rows, stars):
     size_tests_data = int(size_rows / 4)
     size_tests_data_del_2 = int(size_tests_data / 2)

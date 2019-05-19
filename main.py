@@ -36,7 +36,7 @@ def prepare_data():
 
 
 if __name__ == '__main__':
-    # neuronal.run()
-    neuronal_sigmoid.run()
+    neuronal.run()
+    # neuronal_sigmoid.run()
     # take_data()
     # prepare_data()
