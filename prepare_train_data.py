@@ -6,6 +6,14 @@ import normalization as norm
 
 NPY = ".npy"
 
+TF_IDF_SMALL = 'TF_IDF_small'
+TF_IDF_STARS_SMALL = 'TF_IDF_stars_small'
+TF_IDF_VOCAB_SMALL = 'TF_IDF_vocab_small'
+
+TF_IDF_FULL = 'TF_IDF_FULL'
+TF_IDF_STARS_FULL = 'TF_IDF_stars_FULL'
+TF_IDF_VOCAB_FULL = 'TF_IDF_vocab_FULL'
+
 BAG_OF_WORDS_SMALL = 'bag_of_words_small'
 BAG_OF_WORDS_STARS_SMALL = 'bag_of_words_stars_small'
 BAG_OF_WORDS_VOCAB_SMALL = 'bag_of_words_vocab_small'
@@ -16,7 +24,7 @@ BAG_OF_WORDS_VOCAB_FULL = 'bag_of_words_vocab_full'
 
 # BAG_OF_WORDS = 'labeledBow.feat'
 
-MAX_FEATURES = 10000
+MAX_FEATURES = 70000
 
 
 #
@@ -43,8 +51,7 @@ def tfidf_method(norm_text):
     vectorizer = TfidfVectorizer(analyzer="word",
                                  tokenizer=None,
                                  preprocessor=None,
-                                 stop_words=None,
-                                 max_features=MAX_FEATURES)
+                                 stop_words=None)
     matrix = vectorizer.fit_transform(norm_text)
     return matrix.toarray(), vectorizer.get_feature_names()
 
@@ -73,7 +80,7 @@ def write_to_file(train_data, file_name):
 
 
 def prepare_data_by_bag_of_words(is_small=True, is_write=False):
-    train_data = parser. take_train_data(is_small)
+    train_data = parser.take_train_data(is_small)
 
     norm_text = norm.normalization_text_matrix(train_data)
 
@@ -94,4 +101,32 @@ def take_bag_of_words():
     # matrix = np.load(BAG_OF_WORDS_SMALL + NPY)
     # stars = np.load(BAG_OF_WORDS_STARS_SMALL + NPY)
     # vocab = np.load(BAG_OF_WORDS_VOCAB_SMALL + NPY)
+    return matrix, stars, vocab
+
+
+def prepare_data_by_tf_idf(is_small=True, is_write=False):
+    train_data = parser.take_train_data(is_small)
+
+    norm_text = norm.normalization_text_matrix(train_data)
+
+    print("\nTF IFD method")
+    [matrix, vocab] = tfidf_method(norm_text)
+
+    print_info_matrix(matrix, vocab)
+    if is_write:
+        # write_to_file(matrix, TF_IDF_SMALL)
+        # write_to_file(column(train_data, 0), TF_IDF_STARS_SMALL)
+        # write_to_file(vocab, TF_IDF_VOCAB_SMALL)
+        write_to_file(matrix, TF_IDF_FULL)
+        write_to_file(column(train_data, 0), TF_IDF_STARS_FULL)
+        write_to_file(vocab, TF_IDF_VOCAB_FULL)
+
+
+def take_tf_idf():
+    # matrix = np.load(TF_IDF_SMALL + NPY)
+    # stars = np.load(TF_IDF_STARS_SMALL + NPY)
+    # vocab = np.load(TF_IDF_VOCAB_SMALL + NPY)
+    matrix = np.load(TF_IDF_FULL + NPY)
+    stars = np.load(TF_IDF_STARS_FULL + NPY)
+    vocab = np.load(TF_IDF_VOCAB_FULL + NPY)
     return matrix, stars, vocab

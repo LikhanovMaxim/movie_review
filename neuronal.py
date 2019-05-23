@@ -32,8 +32,7 @@ def change(train_y, size):
 # Test-Accuracy: 0.38552000164985656
 # Changed optimizer from 'rmsprop' to adam
 # Test-Accuracy: 0.39996799993515014
-def run():
-    [matrix, stars, vocab] = prepare.take_bag_of_words()
+def run(matrix, stars, vocab):
     prepare.print_info_matrix(matrix, vocab)
     num_words = len(matrix[0])
     size_rows = len(matrix)

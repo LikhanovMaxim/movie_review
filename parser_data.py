@@ -11,7 +11,7 @@ DIRECTORY = "data\\"
 def read_directory(directory, is_small):
     only_files = [f for f in listdir(directory) if isfile(join(directory, f))]
     i = 0
-    matrix = ["0", "a"]  # TODO remove it
+    matrix = ["7", "good"]  # TODO remove it. Bag of words has 0 & "".
     print("start handling files")
     for file in only_files:
         f = open(directory + file, "r", encoding="utf-8")
