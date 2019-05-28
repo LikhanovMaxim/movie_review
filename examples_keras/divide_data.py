@@ -78,14 +78,18 @@ def split_data():
     print(stars.shape)
     frames = [stars, paribas_data]
     res = pd.concat(frames, axis=1, sort=False)
-    # print(res)
+    print('Concat:')
     print(res.shape)
     # TODO what is label in stars? Change them to TARGET or rename TARGET
     train_features, test_features, train_labels, test_labels = train_test_split(
-        res.drop(labels=['TARGET'], axis=1),
-        res['TARGET'],
+        res.drop(labels=[0], axis=1),
+        res[0],
         test_size=0.2,
         random_state=41)
+    print(train_features.shape)
+    print(train_labels.shape)
+    print(train_features[0])
+    print(train_labels[0])
 
 
 NPY = ".npy"

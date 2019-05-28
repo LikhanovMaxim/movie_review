@@ -194,7 +194,7 @@ def use_model():
 
 
 if __name__ == '__main__':
-    # run()
-    use_model()
+    run()
+    # use_model()
     # learn_data()
     # example_second()

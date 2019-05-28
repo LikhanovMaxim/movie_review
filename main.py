@@ -55,12 +55,14 @@ def prepare_data_bag_of_word():
 
 if __name__ == '__main__':
     # Sigmoid
-    # neuronal_sigmoid.run()
+    neuronal_sigmoid.run()
+    # neuronal_sigmoid.run2() #TODO cross-validation
     # neuronal_sigmoid.use_model()
+
     # Softmax
     # [matrix, stars, vocab] = prepare.take_bag_of_words()
-    [matrix, stars, vocab] = prepare.take_tf_idf()
-    neuronal.run(matrix, stars, vocab)
+    # [matrix, stars, vocab] = prepare.take_tf_idf()
+    # neuronal.run(matrix, stars, vocab)
     # take_data()
     # prepare_data_bag_of_word()
     # prepare_data_tf_idf()

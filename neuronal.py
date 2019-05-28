@@ -6,6 +6,11 @@ from keras.datasets import imdb
 import prepare_train_data as prepare
 from keras.models import Sequential
 from keras.layers import Dense, Activation
+from keras import optimizers
+import matplotlib.pyplot as plt
+from sklearn.model_selection import StratifiedKFold
+
+FILE_MODEL = 'neuronal_model.h5'
 
 
 def change(train_y, size):
@@ -39,8 +44,10 @@ def run(matrix, stars, vocab):
     size_tests_data, test_x, test_y, train_x, train_y = divide_train_and_test_data(matrix, size_rows, stars)
     model = create_model(num_words)
     # compiling the model
+    # sgd = optimizers.SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
+    adam = optimizers.Adam(lr=0.001, beta_1=0.9, beta_2=0.999, epsilon=None, decay=0.0, amsgrad=False)
     model.compile(
-        optimizer="rmsprop",
+        optimizer=adam,
         loss="categorical_crossentropy",  # binary_crossentropy
         metrics=["accuracy"]
         # TODO use categorical_crossentropy ? http://qaru.site/questions/196148/keras-modelevaluate-vs-modelpredict-accuracy-difference-in-multi-class-nlp-task/1073471#1073471
@@ -54,18 +61,49 @@ def run(matrix, stars, vocab):
 
     # Debug: np.nonzero(test_x[1] == 1)
 
+    # results = model.fit(
+    #     train_x,
+    #     train_Y,
+    #     epochs=5,  # 5, 10, 15, 20 maximum
+    #     batch_size=128,
+    #     validation_data=(test_x, test_Y)
+    # )
+
     results = model.fit(
-        train_x,
-        train_Y,
+        matrix,
+        stars,
+        validation_split=0.2,
         epochs=5,  # 5, 10, 15, 20 maximum
-        batch_size=32,
-        validation_data=(test_x, test_Y)
+        batch_size=128
     )
-    # TODO add cross-validation: validation_split=0.33
+    # TODO add cross-validation: https://machinelearningmastery.com/evaluate-performance-deep-learning-models-keras/
     score = model.evaluate(test_x, test_Y, verbose=0)
     print("Test-Accuracy:", np.mean(results.history["val_acc"]))
     print('Test score:', score[0])
     print('Test accuracy:', score[1])
+    plot_images(results)
+    model.save(FILE_MODEL)
+
+
+def plot_images(results):
+    history = results
+    print(history.history.keys())
+    # summarize history for accuracy
+    plt.plot(history.history['acc'])
+    plt.plot(history.history['val_acc'])
+    plt.title('model accuracy')
+    plt.ylabel('accuracy')
+    plt.xlabel('epoch')
+    plt.legend(['train', 'test'], loc='upper left')
+    plt.show()
+    # summarize history for loss
+    plt.plot(history.history['loss'])
+    plt.plot(history.history['val_loss'])
+    plt.title('model loss')
+    plt.ylabel('loss')
+    plt.xlabel('epoch')
+    plt.legend(['train', 'test'], loc='upper left')
+    plt.show()
 
 
 def create_model(num_words):
@@ -75,14 +113,20 @@ def create_model(num_words):
     # Input - Layer
     # На каждом слое используется функция «dense» для полного соединения слоев друг с другом.
     hidden_layer = 50
-    model.add(layers.Dense(50, activation="relu", input_shape=(num_words,)))
+    model.add(layers.Dense(250, activation="relu", input_shape=(num_words,)))
     # Hidden - Layers. Dropout
     # Обратите внимание, что вы всегда должны использовать коэффициент исключения в диапазоне от 20% до 50%.
     model.add(layers.Dropout(0.3, noise_shape=None, seed=None))
     # TODO try to change 0.3 & 0.2
-    model.add(layers.Dense(50, activation="relu"))
+    model.add(layers.Dense(100, activation="relu"))
     model.add(layers.Dropout(0.2, noise_shape=None, seed=None))
-    model.add(layers.Dense(50, activation="relu"))
+    model.add(layers.Dense(100, activation="relu"))
+    model.add(layers.Dropout(0.2, noise_shape=None, seed=None))
+    model.add(layers.Dense(100, activation="relu"))
+    model.add(layers.Dropout(0.2, noise_shape=None, seed=None))
+    model.add(layers.Dense(100, activation="relu"))
+    model.add(layers.Dropout(0.2, noise_shape=None, seed=None))
+    model.add(layers.Dense(100, activation="relu"))
     # Output- Layer
     model.add(layers.Dense(11, activation="softmax"))
     model.summary()

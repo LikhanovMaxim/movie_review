@@ -179,8 +179,9 @@ def customize_removing_correlated_features():
     # paribas_data = paribas_data.iloc[:2000, 10000: 20000]
     # Third run delete 720 (25002, 64360)
     # paribas_data = paribas_data.iloc[:2000, 20000: 30000]
-    # 4 run delete
-    paribas_data = paribas_data.iloc[:2000, : 20000]
+    # 4 run delete it takes so long
+    # paribas_data = paribas_data.iloc[:2000, : 20000]
+    paribas_data = paribas_data.iloc[:2000, 30000: 40000]
     print(paribas_data.shape)
     # paribas_data = smth(paribas_data)
     print(paribas_data.shape)
