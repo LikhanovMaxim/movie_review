@@ -3,6 +3,11 @@ from keras import models
 from keras import layers
 import prepare_train_data as prepare
 
+FILE_MODEL = 'neuronal_sigmoid_model.h5'
+BAG_OF_WORDS_FULL_AFTER_FS = "full_after_fs_bag_of_words"
+BAG_OF_WORDS_STARS_FULL_AFTER_FS = "full_after_fs_bag_of_words_start"
+BAG_OF_WORDS_VOCAB_FULL_AFTER_FS = "full_after_fs_bag_of_words_vocab"
+
 
 # 18500/18752 [============================>.] - ETA: 0s - loss: 0.2019 - acc: 0.9316
 # 18752/18752 [==============================] - 38s 2ms/step
@@ -23,7 +28,9 @@ def modify_stars_to_bi_optional(stars):
 
 
 def run():
-    [matrix, stars, vocab] = prepare.take_bag_of_words()
+    [matrix, stars, vocab] = prepare.take_bag_of_words(BAG_OF_WORDS_FULL_AFTER_FS,
+                                                       BAG_OF_WORDS_STARS_FULL_AFTER_FS,
+                                                       BAG_OF_WORDS_VOCAB_FULL_AFTER_FS)
     prepare.print_info_matrix(matrix, vocab)
     num_words = len(matrix[0])
     size_rows = len(matrix)
@@ -39,7 +46,7 @@ def run():
     results = model.fit(
         train_x,
         train_y,
-        epochs=1,  # 5, 10, 15, 20 maximum
+        epochs=2,  # 5, 10, 15, 20 maximum
         batch_size=500,
         validation_data=(test_x, test_y)
     )
@@ -47,6 +54,7 @@ def run():
     print("Test-Accuracy:", np.mean(results.history["val_acc"]))
     print('Test score:', score[0])
     print('Test accuracy:', score[1])
+    model.save(FILE_MODEL)
 
 
 def create_model(num_words):
@@ -73,3 +81,16 @@ def divide_train_and_test_data(matrix, size_rows, stars):
     test_x = np.concatenate((matrix[0:size_tests_data_del_2], matrix[size_before_smth:size_rows]))
     test_y = np.concatenate((stars[0:size_tests_data_del_2], stars[size_before_smth:size_rows]))
     return size_tests_data, test_x, test_y, train_x, train_y
+
+
+def use_model():
+    new_model = models.load_model(FILE_MODEL)
+    [matrix, stars, vocab] = prepare.take_bag_of_words()
+    # data = vectorization(data, num_words)
+    # test_x, test_y, train_x, train_y = divide_train_and_test_data(data, targets)
+    num_words = len(matrix[0])
+    size_rows = len(matrix)
+    size_tests_data, test_x, test_y, train_x, train_y = divide_train_and_test_data(matrix, size_rows, stars)
+    print(train_y[1:2])
+    res = new_model.predict_classes(train_x[1:2, :])
+    print(res)

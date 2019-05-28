@@ -11,16 +11,19 @@
         - Status - done.
         - Package/class/method - prepare_train_data.py.
     - TF-IDF
-        - Status - open
+        - Status - done
+        - Package/class/method - prepare_train_data.py.
+1) Reduce the size of data
+    - Feature Selection
+        - Filter
+        - 
+    - Feature Extraction
          
 1) Create neural network by vector 
     - lib Keras, softmax
         - Status - done 
-        - Package/class/method -
+        - Package/class/method - neuronal.py
         
    
 
 
-TODO:
-
-1) Decrease bag_of_words_full.npy 12,3 ГБ O_o

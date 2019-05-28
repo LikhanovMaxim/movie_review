@@ -4,8 +4,17 @@ from sklearn.model_selection import train_test_split
 from sklearn.feature_selection import VarianceThreshold
 import prepare_train_data as prepare
 
-
 # https://stackabuse.com/applying-filter-methods-in-python-for-feature-selection/
+BAG_OF_WORDS_FULL = 'bag_of_words_full'
+BAG_OF_WORDS_STARS_FULL = 'bag_of_words_stars_full'
+BAG_OF_WORDS_VOCAB_FULL = 'bag_of_words_vocab_full'
+BAG_OF_WORDS_FULL_AFTER_FS = "full_after_fs_bag_of_words"
+BAG_OF_WORDS_STARS_FULL_AFTER_FS = "full_after_fs_bag_of_words_start"
+BAG_OF_WORDS_VOCAB_FULL_AFTER_FS = "full_after_fs_bag_of_words_vocab"
+BAG_OF_WORDS_SMALL = 'bag_of_words_small'
+BAG_OF_WORDS_STARS_SMALL = 'bag_of_words_stars_small'
+BAG_OF_WORDS_VOCAB_SMALL = 'bag_of_words_vocab_small'
+
 
 def remove_constant_features():
     test_features, train_features = prepare_test_dataset()
@@ -150,11 +159,28 @@ def removing_correlated_features():
 
 
 def customize_removing_correlated_features():
-    matrix, stars, vocab = prepare.take_bag_of_words()
+    # matrix, stars, vocab = prepare.take_bag_of_words(BAG_OF_WORDS_FULL_AFTER_FS,
+    #                                                  BAG_OF_WORDS_STARS_FULL_AFTER_FS,
+    #                                                  BAG_OF_WORDS_VOCAB_FULL_AFTER_FS)
+    matrix, stars, vocab = prepare.take_bag_of_words(BAG_OF_WORDS_FULL_AFTER_FS,
+                                                     BAG_OF_WORDS_STARS_FULL_AFTER_FS,
+                                                     BAG_OF_WORDS_VOCAB_FULL_AFTER_FS)
+    # matrix, stars, vocab = prepare.take_bag_of_words(BAG_OF_WORDS_SMALL,
+    #                                                  BAG_OF_WORDS_STARS_SMALL,
+    #                                                  BAG_OF_WORDS_VOCAB_SMALL)
     print(matrix.shape)
     # paribas_data = matrix
     paribas_data = pd.DataFrame(matrix)
     # paribas_data = pd.read_csv("E:/git projects/datasets/train.csv", nrows=20000)
+    # first run delete 601
+    # paribas_data = paribas_data.head(1000)
+    # paribas_data = paribas_data.iloc[:, : 10000]
+    # second run delete 763 (25002, 65080)
+    # paribas_data = paribas_data.iloc[:2000, 10000: 20000]
+    # Third run delete 720 (25002, 64360)
+    # paribas_data = paribas_data.iloc[:2000, 20000: 30000]
+    # 4 run delete
+    paribas_data = paribas_data.iloc[:2000, : 20000]
     print(paribas_data.shape)
     # paribas_data = smth(paribas_data)
     print(paribas_data.shape)
@@ -162,23 +188,34 @@ def customize_removing_correlated_features():
     #     paribas_data.drop(labels=['TARGET', 'ID'], axis=1),
     #     paribas_data['TARGET'],
     #     test_size=0.2,
-    #     random_state=41)
+    #     random_ state=41)
+    correlated_features = find_corr_features(paribas_data)
+    # print(correlated_features)
+    new_matrix = pd.DataFrame(matrix)
+    new_matrix.drop(labels=correlated_features, axis=1, inplace=True)
+    # test_features.drop(labels=correlated_features, axis=1, inplace=True)
+    print(new_matrix.shape)
+    prepare.write_to_file(new_matrix, BAG_OF_WORDS_FULL_AFTER_FS)
+    prepare.write_to_file(stars, BAG_OF_WORDS_STARS_FULL_AFTER_FS)
+    prepare.write_to_file(vocab, BAG_OF_WORDS_VOCAB_FULL_AFTER_FS)
+    print("Finish")
+    # print(test_features.shape)
+
+
+def find_corr_features(paribas_data):
     correlated_features = set()
     print("Before corr")
     correlation_matrix = paribas_data.corr()
     print("Find features which ")
-    # print(correlation_matrix)
+    print(correlation_matrix.shape)
+    print(correlation_matrix)
     for i in range(len(correlation_matrix.columns)):
         for j in range(i):
             if abs(correlation_matrix.iloc[i, j]) > 0.8:
                 colname = correlation_matrix.columns[i]
                 correlated_features.add(colname)
     print(len(correlated_features))
-    # print(correlated_features)
-    paribas_data.drop(labels=correlated_features, axis=1, inplace=True)
-    # test_features.drop(labels=correlated_features, axis=1, inplace=True)
-    print(paribas_data.shape)
-    # print(test_features.shape)
+    return correlated_features
 
 
 def smth(paribas_data):

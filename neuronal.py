@@ -58,7 +58,7 @@ def run(matrix, stars, vocab):
         train_x,
         train_Y,
         epochs=5,  # 5, 10, 15, 20 maximum
-        batch_size=500,
+        batch_size=32,
         validation_data=(test_x, test_Y)
     )
     # TODO add cross-validation: validation_split=0.33

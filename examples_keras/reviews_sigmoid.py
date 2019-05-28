@@ -4,17 +4,24 @@ from keras.utils import to_categorical
 from keras import models
 from keras import layers
 from keras.datasets import imdb
-import prepare_train_data as prepare
+# import prepare_train_data as prepare
 from keras.models import Sequential
 from keras.layers import Dense, Activation
 from keras.utils import plot_model
+import matplotlib.pyplot as plt
+from keras import optimizers
 
+# from tensorflow import keras
+# from tensorflow.keras import layers
 
 # Пришло время подготовить данные. Нужно векторизовать каждый обзор и заполнить его нулями,
 # чтобы вектор содержал ровно 10 000 чисел. Это означает, что каждый обзор,
 # который короче 10 000 слов, мы заполняем нулями. Это делается потому,
 # что самый большой обзор имеет почти такой же размер, а каждый элемент
 # входных данных нашей нейронной сети должен иметь одинаковый размер.
+FILE_MODEL = 'reviews_sigmoid_model.h5'
+
+
 def vectorization(sequences, dimension=10000):
     results = np.zeros((len(sequences), dimension))
     for i, sequence in enumerate(sequences):
@@ -49,6 +56,11 @@ def run():
     # Оптимизатор — это алгоритм, который изменяет веса и смещения во время обучения.
     # В качестве функции потерь используем бинарную кросс-энтропию (так как мы работаем с бинарной классификацией),
     # в качестве метрики оценки — точность.
+
+    # TODO sgd vs adam
+    # TODO decay & momentum
+    sgd = optimizers.SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
+
     model.compile(
         optimizer="adam",
         loss="binary_crossentropy",
@@ -67,10 +79,31 @@ def run():
     results = model.fit(
         train_x, train_y,
         epochs=2,
-        batch_size=500,
+        batch_size=32,
         validation_data=(test_x, test_y)
     )
     print("Test-Accuracy:", np.mean(results.history["val_acc"]))
+    history = results
+    print(history.history.keys())
+    # summarize history for accuracy
+    plt.plot(history.history['acc'])
+    plt.plot(history.history['val_acc'])
+    plt.title('model accuracy')
+    plt.ylabel('accuracy')
+    plt.xlabel('epoch')
+    plt.legend(['train', 'test'], loc='upper left')
+    plt.show()
+    # summarize history for loss
+    plt.plot(history.history['loss'])
+    plt.plot(history.history['val_loss'])
+    plt.title('model loss')
+    plt.ylabel('loss')
+    plt.xlabel('epoch')
+    plt.legend(['train', 'test'], loc='upper left')
+    plt.show()
+    # Save the model
+    model.save(FILE_MODEL)
+    # keras.experimental.export_saved_model(model, FILE_MODEL)
 
 
 def create_model(num_words):
@@ -141,7 +174,27 @@ def learn_data():
     print(decoded)
 
 
+def use_model():
+    new_model = models.load_model(FILE_MODEL)
+    data, num_words, targets = take_data()
+    data = vectorization(data, num_words)
+    test_x, test_y, train_x, train_y = divide_train_and_test_data(data, targets)
+    print(train_x.shape)
+    # test = [][train_x[0]]
+    # b = test.reshape(10000, 1)
+    # a = np.reshape(test, )
+    # print(test)
+    # print(test.shape)
+    # train_x[:1, :].shape
+    res = new_model.predict_classes(test_x[:1, :])
+    # res = new_model.predict_classes(test)
+    print(res)
+    # new_model.
+    # new_model = keras.experimental.load_from_saved_model(FILE_MODEL)
+
+
 if __name__ == '__main__':
-    run()
+    # run()
+    use_model()
     # learn_data()
     # example_second()

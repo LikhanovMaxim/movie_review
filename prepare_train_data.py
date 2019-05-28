@@ -94,10 +94,10 @@ def prepare_data_by_bag_of_words(is_small=True, is_write=False):
         write_to_file(vocab, BAG_OF_WORDS_VOCAB_SMALL)
 
 
-def take_bag_of_words():
-    matrix = np.load(BAG_OF_WORDS_FULL + NPY)
-    stars = np.load(BAG_OF_WORDS_STARS_FULL + NPY)
-    vocab = np.load(BAG_OF_WORDS_VOCAB_FULL + NPY)
+def take_bag_of_words(file_matrix=BAG_OF_WORDS_FULL, file_stars=BAG_OF_WORDS_STARS_FULL, file_vocab=BAG_OF_WORDS_VOCAB_FULL):
+    matrix = np.load(file_matrix + NPY)
+    stars = np.load(file_stars + NPY)
+    vocab = np.load(file_vocab + NPY)
     # matrix = np.load(BAG_OF_WORDS_SMALL + NPY)
     # stars = np.load(BAG_OF_WORDS_STARS_SMALL + NPY)
     # vocab = np.load(BAG_OF_WORDS_VOCAB_SMALL + NPY)
